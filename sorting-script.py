@@ -2,25 +2,11 @@ import os
 import pathlib
 import pandas as pd
 import shutil
-import time
-import csv
+import glob
 
-# finding the path of where you are
-path = pathlib.Path(__file__).parent.resolve()
-
-# grabbing the current directories in the path
-dirs = os.listdir( path ) # this grabs where you are
-
-# Check to see if trasncribed directory exists
-# if it doesn't exist - it will make a new one
-if not os.path.isdir(str(path) +'/transcribed'):
-  print('making new directory')
-  os.mkdir(str(path) +'/transcribed')
-
-# defining the directory where we will put the transcribed documents
-transcribed_documents_path = str(path) +'/transcribed/'
-
-
+#  ----------- Methods -------------
+def listdir_nohidden(path):
+    return glob.glob(os.path.join(path, '*'))
 
 
 def collect_data(dir, directory_name):
@@ -58,9 +44,14 @@ def collect_data(dir, directory_name):
           internal_id = str(metadata.loc[metadata.index[row_index], 'internal_id'])
           new_file_name = internal_id + '.txt'
           csv_file_name = internal_id + '.csv'
-            
+
+          # ------------------ ******************** -------------------------------------
           # Get the document number for the file name
+          # THIS NUMBER WILL HAVE TO CHANGE WHEN RECORD NUMBERS HAVE MORE DIGITS THAN 21
           document_number = internal_id[0 : 21]
+          # CHANGE REQUIRED WHEN SORTING DIFFERENT RECORDS - CHECK
+          # ------------------ ******************** -------------------------------------
+
 
           old_file = tdir + '/' + file
           new_file = transcribed_documents_path + '/' + document_number + "/" + new_file_name
@@ -81,7 +72,28 @@ def collect_data(dir, directory_name):
           df = pd.read_fwf(old_file)
           df.to_csv(new_csv_file)
 
-  
+
+
+
+
+# -------- Actual script starts here --------------
+
+# finding the path of where you are
+path = pathlib.Path(__file__).parent.resolve()
+
+# grabbing the current directories in the path
+dirs = listdir_nohidden(path) # this grabs where you are
+
+# Check to see if trasncribed directory exists
+# if it doesn't exist - it will make a new one
+if not os.path.isdir(str(path) +'/transcribed'):
+  print('making new directory')
+  os.mkdir(str(path) +'/transcribed')
+
+# defining the directory where we will put the transcribed documents
+transcribed_documents_path = str(path) +'/transcribed/'
+
+
 
 # Iterate through folders in directory
 for item in dirs:
